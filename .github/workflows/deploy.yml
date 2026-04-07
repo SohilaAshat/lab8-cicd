@@ -1,22 +1,25 @@
 name: Deploy to EC2
-
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: SSH into EC2
-        uses: appleboy/ssh-action@v0.1.6
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: SSH to EC2 and deploy
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.EC2_KEY }}
           script: |
             cd ~/lab8-cicd
             git pull
             docker-compose pull
             docker-compose down
-            docker-compose up -d --build
+            docker-compose up -d
